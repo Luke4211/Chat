@@ -9,12 +9,14 @@ import (
     "net"
     "bufio"
     "os"
+    "strings"
 )
 
 func main() {
 
     var conn net.Conn
     var err error
+    var username string
     defaultPort := ":10500"
     reader := bufio.NewReader(os.Stdin)
     connected := false
@@ -25,14 +27,22 @@ func main() {
          * prompt user for IP to connect.
          */
         if !connected {
-            fmt.Println("Enter IP in order to connect, or type exit to terminate.")
-            ip, _ := reader.ReadString('\n')
+            fmt.Println("Enter <username> <IP> in order to connect, or type exit to terminate.")
+            input, _ := reader.ReadString('\n')
+
+            if input == "exit\n" {
+                return
+            }
+
+            split := strings.Split(input, " ")
+            username = split[0]
+            ip := split[1]
 
             //Remove the newline character from IP.
             ip = ip[0:len(ip)-1]
-            if ip == "exit" {
-                return
-            }
+
+            fmt.Print(username)
+
 
             //Attempt to connect to server.
             conn, err = net.Dial("tcp", ip + defaultPort)
@@ -48,6 +58,7 @@ func main() {
             }
         }
         if connected {
+            fmt.Print(username + ":")
             msg, _ := reader.ReadString('\n')
             if msg == ("!quit\n") {
                 connected = false
