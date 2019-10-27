@@ -13,7 +13,7 @@ import (
 func main() {
     numClients := 0
     listener, _ := net.Listen("tcp", ":10500")
-    
+
     var clientChans = struct {
         sync.RWMutex
         m map[int]chan string
@@ -45,7 +45,7 @@ func handleClient(connection net.Conn, clientChans struct {sync.RWMutex; m map[i
             return
         } else {
             clientChans.Lock()
-            connection.Write([]byte(msg + "\n"))
+            connection.Write([]byte("[" + strconv.Itoa(clientNum) + "]:" + msg + "\n"))
             clientChans.Unlock()
         }
     }
