@@ -20,6 +20,7 @@ func main() {
     defaultPort := ":10500"
     reader := bufio.NewReader(os.Stdin)
     connected := false
+    firstMsg := true
 
 
     for {
@@ -27,6 +28,7 @@ func main() {
          * prompt user for IP to connect.
          */
         if !connected {
+
             fmt.Println("Enter <username> <IP> in order to connect, or type exit to terminate.")
             input, _ := reader.ReadString('\n')
 
@@ -41,7 +43,7 @@ func main() {
             //Remove the newline character from IP.
             ip = ip[0:len(ip)-1]
 
-            fmt.Print(username)
+            //fmt.Print(username)
 
 
             //Attempt to connect to server.
@@ -58,10 +60,16 @@ func main() {
             }
         }
         if connected {
-            fmt.Print(username + ":")
+
+            if firstMsg {
+                fmt.Fprintf(conn, username + "\n")
+                firstMsg = false
+            }
+            //fmt.Print(username + ": ")
             msg, _ := reader.ReadString('\n')
             if msg == ("!quit\n") {
                 connected = false
+                firstMsg = true
             }
             //Send message to the server
             fmt.Fprintf(conn, msg + "\n")

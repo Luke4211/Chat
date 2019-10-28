@@ -45,7 +45,7 @@ func handleClient(connection net.Conn, clientChans struct {sync.RWMutex; m map[i
             return
         } else {
             clientChans.Lock()
-            connection.Write([]byte("[" + strconv.Itoa(clientNum) + "]:" + msg + "\n"))
+            connection.Write([]byte(msg + "\n"))
             clientChans.Unlock()
         }
     }
@@ -54,6 +54,8 @@ func handleClient(connection net.Conn, clientChans struct {sync.RWMutex; m map[i
 
 func getMessages(connection net.Conn, clientChans struct {sync.RWMutex; m map[int]chan string}, clientNum int) {
     running := true
+    username, _ := bufio.NewReader(connection).ReadString('\n')
+    username = username[0:len(username)-1]
     for running {
         message, _ := bufio.NewReader(connection).ReadString('\n')
         if message == "!quit\n" {
@@ -63,13 +65,15 @@ func getMessages(connection net.Conn, clientChans struct {sync.RWMutex; m map[in
             clientChans.Unlock()
         } else {
             fmt.Print(message)
-            go broadcast(message, clientChans, clientNum)
+            go broadcast(message, clientChans, clientNum, username)
         }
 
     }
 }
 
-func broadcast(msg string, clientChans struct { sync.RWMutex; m map[int]chan string} , clientNum int) {
+func broadcast(msg string, clientChans struct { sync.RWMutex; m map[int]chan string} , clientNum int, username string) {
+    msg = username + ": " + msg
+    fmt.Println(msg)
     clientChans.Lock()
     for key, client := range clientChans.m {
         if key != clientNum {
