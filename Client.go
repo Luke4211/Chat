@@ -43,18 +43,16 @@ func main() {
             //Remove the newline character from IP.
             ip = ip[0:len(ip)-1]
 
-            //fmt.Print(username)
-
-
             //Attempt to connect to server.
             conn, err = net.Dial("tcp", ip + defaultPort)
             if err != nil {
+                fmt.Println(err)
                 fmt.Println("Error connecting, verify IP address.")
             } else {
                 connected = true
                 fmt.Println("Connected, type messages below. Type !quit to disconnect.")
 
-                //Upon succesfull connection, launch getMessages
+                //Upon sucessfull connection, launch getMessages
                 //in a seperate goroutine to fetch messages from server
                 go getMessages(conn)
             }
@@ -65,11 +63,13 @@ func main() {
                 fmt.Fprintf(conn, username + "\n")
                 firstMsg = false
             }
-            //fmt.Print(username + ": ")
+
             msg, _ := reader.ReadString('\n')
             if msg == ("!quit\n") {
                 connected = false
                 firstMsg = true
+
+
             }
             //Send message to the server
             fmt.Fprintf(conn, msg + "\n")
